@@ -39,3 +39,31 @@ go test ./...
 
 Bij wijzigingen in deze module moeten de afhankelijke register-repos hun
 `go.mod` bijwerken naar de nieuwe pseudo-version of tag.
+
+## Releasen
+
+Deze module volgt de standaard Go module release-flow: een semver git-tag is de
+packageversie. Een GitHub Release is handig voor zichtbaarheid, maar Go gebruikt
+de git-tag zelf.
+
+Maak na het mergen naar `main` een tag:
+
+```bash
+git checkout main
+git pull
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Een tag met formaat `v*.*.*` triggert de release workflow. Die workflow draait
+lint en tests en maakt daarna automatisch een GitHub Release aan.
+
+Werk daarna afhankelijke registers bij naar de tag:
+
+```bash
+go get github.com/developer-overheid-nl/don-register-common@v0.1.0
+go mod tidy
+```
+
+Gebruik voor major versie 2 of hoger pas een tag zoals `v2.0.0` nadat ook het
+modulepad volgens Go modules is aangepast naar `/v2`.
