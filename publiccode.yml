@@ -1,0 +1,52 @@
+publiccodeYmlVersion: "0.5"
+
+name: DON Register Common
+url: "https://github.com/developer-overheid-nl/don-register-common"
+softwareType: library
+platforms:
+  - linux
+  - mac
+  - windows
+
+categories:
+  - it-management
+developmentStatus: development
+
+description:
+  nl:
+    shortDescription: >-
+      Gedeelde Go-packages voor de DON register-services.
+    longDescription: |
+      DON Register Common bevat generieke infrastructuurcode voor de register-services
+      van developer.overheid.nl, zoals Problem Details responses, pagination headers,
+      filtermodellen, Typesense indexing helpers, databaseconnectie helpers en
+      Gin-router bootstrapcode. De package voorkomt dat dezelfde ondersteunende code
+      apart onderhouden moet worden in het API-register en OSS-register.
+    features:
+      - Gedeelde Problem Details responsemodellen
+      - Gedeelde pagination en filter helpers
+      - Gedeelde Typesense indexing infrastructuur
+      - Gedeelde HTTP, database en router helpers
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Geonovum
+  repoOwner: Geonovum
+
+intendedAudience:
+  countries:
+    - NL
+  scope:
+    - government
+
+localisation:
+  availableLanguages:
+    - nl
+  localisationReady: false
+
+maintenance:
+  type: internal
+  contacts:
+    - name: developer.overheid.nl
+      email: developer.overheid@geonovum.nl
+      affiliation: Geonovum
