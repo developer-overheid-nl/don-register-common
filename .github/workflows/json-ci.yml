@@ -12,11 +12,11 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
       - name: Run Super-Linter
-        uses: super-linter/super-linter@9e863354e3ff62e0727d37183162c4a88873df41
+        uses: super-linter/super-linter@v8.7.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
