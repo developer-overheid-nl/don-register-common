@@ -1,3 +1,3 @@
 kind: Changed
-body: Upgrade Go, Go module dependencies and GitHub Actions workflow versions.
+body: Upgrade Go, Go module dependencies and GitHub Actions workflow versions, and expand unit test coverage above 80%.
 time: 2026-07-08T10:00:23.667551+02:00
