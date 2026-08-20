@@ -9,9 +9,10 @@ bouwstenen.
 
 ## Packages
 
-- `database`: Postgres/GORM connectie helper.
+- `database`: Postgres/GORM connectie- en logginghelpers.
 - `filters`: gedeelde filter response-modellen en option builders.
 - `httpclient`: HTTP helpers en TOOI organisatielabel lookup.
+- `logging`: JSON-logger en adapters voor Gin, cron en line-oriented output.
 - `pagination`: pagination model, normalisatie en HTTP response headers.
 - `problem`: Problem Details response types.
 - `query`: query helpers zoals SQL LIKE escaping en filter counts.
@@ -28,6 +29,29 @@ go get github.com/developer-overheid-nl/don-register-common
 
 Gebruik vanuit register-repos bij voorkeur kleine wrappers of type aliases als
 de bestaande package-API stabiel moet blijven.
+
+### Gestructureerde logging
+
+Maak één JSON-logger voor de applicatie en installeer de adapters bij het
+opstarten:
+
+```go
+logger, err := logging.NewJSONLogger(os.Stdout, "oss-register", os.Getenv("LOG_LEVEL"))
+if err != nil {
+    return err
+}
+slog.SetDefault(logger)
+database.ConfigureDefaultLogging(logger)
+
+engine.Use(logging.NewGinMiddleware(logger))
+database.ConfigureLogging(db, logger)
+```
+
+Een lege `LOG_LEVEL` gebruikt `info`. De ondersteunde waarden zijn `debug`,
+`info`, `warn` en `error`. De logger voegt het opgegeven `app`-veld toe aan
+iedere regel. Applicaties voegen per event minimaal `component` en `operation`
+toe. De Gin-middleware logt 4xx-responses als `INFO`, 5xx-responses als
+`ERROR`, en neemt bewust geen querystring op in `path`.
 
 ## Ontwikkelen
 
