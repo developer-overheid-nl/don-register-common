@@ -1,3 +1,0 @@
-kind: Added
-body: Voeg herbruikbare JSON-logging en adapters voor Gin, cron en GORM toe voor de DON register-applicaties.
-time: 2026-08-20T11:00:00+02:00
