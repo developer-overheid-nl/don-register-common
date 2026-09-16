@@ -9,6 +9,7 @@ bouwstenen.
 
 ## Packages
 
+- `auth`: OAuth 2.0 `client_credentials` HTTP-client met automatische tokenvernieuwing.
 - `database`: Postgres/GORM connectie- en logginghelpers.
 - `filters`: gedeelde filter response-modellen en option builders.
 - `httpclient`: HTTP helpers en TOOI organisatielabel lookup.
