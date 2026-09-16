@@ -1,3 +1,0 @@
-kind: Added
-body: Add a reusable OAuth 2.0 client credentials HTTP client with automatic token renewal.
-time: 2026-09-16T13:46:09+02:00
