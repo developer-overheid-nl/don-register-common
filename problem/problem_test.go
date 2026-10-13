@@ -1,6 +1,7 @@
 package problem
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
 	"testing"
@@ -17,27 +18,37 @@ func TestProblemConstructors(t *testing.T) {
 		{
 			name: "New",
 			got:  New(http.StatusTeapot, "teapot", detail),
-			want: Problem{Status: http.StatusTeapot, Title: "teapot", Errors: []ErrorDetail{detail}},
+			want: Problem{Status: http.StatusTeapot, Title: "teapot", Detail: "name is required", Errors: []ErrorDetail{detail}},
 		},
 		{
 			name: "NewBadRequest",
 			got:  NewBadRequest("bad request", detail),
-			want: Problem{Status: http.StatusBadRequest, Title: "bad request", Errors: []ErrorDetail{detail}},
+			want: Problem{Status: http.StatusBadRequest, Title: "bad request", Detail: "name is required", Errors: []ErrorDetail{detail}},
 		},
 		{
 			name: "NewNotFound",
 			got:  NewNotFound("not found"),
-			want: Problem{Status: http.StatusNotFound, Title: "not found"},
+			want: Problem{Status: http.StatusNotFound, Title: "not found", Detail: "not found"},
 		},
 		{
 			name: "NewInternalServerError",
 			got:  NewInternalServerError("internal"),
-			want: Problem{Status: http.StatusInternalServerError, Title: "internal"},
+			want: Problem{Status: http.StatusInternalServerError, Title: "internal", Detail: "internal"},
 		},
 		{
 			name: "NewForbidden",
 			got:  NewForbidden("forbidden"),
-			want: Problem{Status: http.StatusForbidden, Title: "forbidden"},
+			want: Problem{Status: http.StatusForbidden, Title: "forbidden", Detail: "forbidden"},
+		},
+		{
+			name: "NewMethodNotAllowed",
+			got:  NewMethodNotAllowed("method not allowed"),
+			want: Problem{Status: http.StatusMethodNotAllowed, Title: "method not allowed", Detail: "method not allowed"},
+		},
+		{
+			name: "NewWithDetail",
+			got:  NewWithDetail(http.StatusBadRequest, "bad request", "the name is missing", detail),
+			want: Problem{Status: http.StatusBadRequest, Title: "bad request", Detail: "the name is missing", Errors: []ErrorDetail{detail}},
 		},
 	}
 
@@ -50,6 +61,30 @@ func TestProblemConstructors(t *testing.T) {
 				t.Fatalf("Error() = %q, want %q", tt.got.Error(), tt.want.Title)
 			}
 		})
+	}
+}
+
+func TestDetailJoinsErrorDetails(t *testing.T) {
+	got := New(http.StatusBadRequest, "bad request",
+		ErrorDetail{Location: "name", Detail: "name is required"},
+		ErrorDetail{Location: "url", Detail: " "},
+		ErrorDetail{Location: "url", Detail: "url is invalid"},
+	)
+	if got.Detail != "name is required; url is invalid" {
+		t.Fatalf("Detail = %q, want the error details joined with \"; \"", got.Detail)
+	}
+	if empty := NewWithDetail(http.StatusNotFound, "not found", ""); empty.Detail != "not found" {
+		t.Fatalf("Detail = %q, want the title as fallback", empty.Detail)
+	}
+}
+
+func TestDetailIsAlwaysSerialized(t *testing.T) {
+	body, err := json.Marshal(NewNotFound("not found"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != `{"title":"not found","status":404,"detail":"not found"}` {
+		t.Fatalf("json = %s", body)
 	}
 }
 
