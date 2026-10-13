@@ -112,7 +112,7 @@ func assertProblemResponse(t *testing.T, rec *httptest.ResponseRecorder, status 
 	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
 		t.Fatal(err)
 	}
-	if body.Status != status || body.Title != title {
-		t.Fatalf("body = %#v, want status %d title %q", body, status, title)
+	if body.Status != status || body.Title != title || body.Detail != title {
+		t.Fatalf("body = %#v, want status %d and title and detail %q", body, status, title)
 	}
 }

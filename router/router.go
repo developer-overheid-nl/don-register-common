@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/developer-overheid-nl/don-register-common/problem"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -35,7 +33,7 @@ func NewEngine(apiVersion string, opts CORSOptions) *gin.Engine {
 
 func InstallProblemHandlers(g *gin.Engine, apiVersion string) {
 	g.NoMethod(func(c *gin.Context) {
-		apiErr := problem.New(http.StatusMethodNotAllowed, "Method not allowed")
+		apiErr := problem.NewMethodNotAllowed("Method not allowed")
 		c.Abort()
 		c.Header("API-Version", apiVersion)
 		c.Header("Content-Type", "application/problem+json")
