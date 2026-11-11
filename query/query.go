@@ -85,7 +85,15 @@ func SortFilterCounts(counts []filters.FilterCount) {
 		if iKey != jKey {
 			return iKey < jKey
 		}
-		return strings.ToLower(counts[i].Value) < strings.ToLower(counts[j].Value)
+		iValue := strings.ToLower(counts[i].Value)
+		jValue := strings.ToLower(counts[j].Value)
+		if iValue != jValue {
+			return iValue < jValue
+		}
+		// Waarden die alleen in hoofdletters verschillen krijgen een vaste
+		// volgorde, kleine letters eerst. Anders hangt de uitkomst af van de
+		// willekeurige volgorde waarin Go over de map met tellingen loopt.
+		return counts[i].Value > counts[j].Value
 	})
 }
 
