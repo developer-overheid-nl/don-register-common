@@ -1,7 +1,9 @@
 package filters
 
 import (
+	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -31,6 +33,24 @@ func TestFilterGroupValidate(t *testing.T) {
 		{
 			name:    "date rejects non string",
 			group:   FilterGroup{Key: "created", Type: "date", Value: 20260708},
+			wantErr: true,
+		},
+		{
+			name:  "search-select accepts no showTop",
+			group: FilterGroup{Key: "organisation", Type: "search-select"},
+		},
+		{
+			name:  "search-select accepts positive showTop",
+			group: FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(10)},
+		},
+		{
+			name:    "search-select rejects zero showTop",
+			group:   FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(0)},
+			wantErr: true,
+		},
+		{
+			name:    "showTop only applies to search-select",
+			group:   FilterGroup{Key: "license", Type: "multi-select", ShowTop: intPtr(5)},
 			wantErr: true,
 		},
 		{
@@ -114,3 +134,39 @@ func TestSortOptionsUsesLabelCaseInsensitiveThenValue(t *testing.T) {
 		t.Fatalf("sorted values = %#v, want %#v", got, want)
 	}
 }
+
+func TestSortOptionsByCountPutsLargestFirstThenLabel(t *testing.T) {
+	options := []FilterOption{
+		{Value: "a", Label: "Zulu", Count: 3},
+		{Value: "b", Label: "beta", Count: 10},
+		{Value: "c", Label: "Alpha", Count: 3},
+		{Value: "d", Label: "alpha", Count: 3},
+	}
+
+	SortOptionsByCount(options)
+
+	got := []string{options[0].Value, options[1].Value, options[2].Value, options[3].Value}
+	want := []string{"b", "c", "d", "a"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("sorted values = %#v, want %#v", got, want)
+	}
+}
+
+func TestFilterGroupMarshalsShowTopOnlyWhenSet(t *testing.T) {
+	without, err := json.Marshal(FilterGroup{Key: "license", Type: "multi-select"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(without), "showTop") {
+		t.Fatalf("showTop present without value: %s", without)
+	}
+	with, err := json.Marshal(FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(10)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(with), `"showTop":10`) {
+		t.Fatalf("showTop missing: %s", with)
+	}
+}
+
+func intPtr(value int) *int { return &value }

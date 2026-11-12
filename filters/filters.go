@@ -22,9 +22,20 @@ type FilterGroup struct {
 	Value       any            `json:"value,omitempty"`
 	Count       *int           `json:"count,omitempty"`
 	Options     []FilterOption `json:"options,omitempty"`
+	// ShowTop is how many options a search-select filter shows before the
+	// user searches or expands the list.
+	ShowTop *int `json:"showTop,omitempty"`
 }
 
 func (f FilterGroup) Validate() error {
+	if f.ShowTop != nil {
+		if f.Type != "search-select" {
+			return fmt.Errorf("filter %q: showTop only applies to search-select, not %q", f.Key, f.Type)
+		}
+		if *f.ShowTop < 1 {
+			return fmt.Errorf("filter %q: showTop must be at least 1, got %d", f.Key, *f.ShowTop)
+		}
+	}
 	switch f.Type {
 	case "toggle":
 		if f.Value == nil {
@@ -118,13 +129,29 @@ func SelectedLowerSet(groups ...[]string) map[string]bool {
 	return lowered
 }
 
+// SortOptionsByCount puts the options with the most matches first, for
+// filters that show only the top options; ties sort as in SortOptions.
+func SortOptionsByCount(options []FilterOption) {
+	sort.SliceStable(options, func(i, j int) bool {
+		if options[i].Count != options[j].Count {
+			return options[i].Count > options[j].Count
+		}
+		return optionLess(options[i], options[j])
+	})
+}
+
 func SortOptions(options []FilterOption) {
 	sort.Slice(options, func(i, j int) bool {
-		left := strings.ToLower(options[i].Label)
-		right := strings.ToLower(options[j].Label)
-		if left == right {
-			return options[i].Value < options[j].Value
-		}
-		return left < right
+		return optionLess(options[i], options[j])
 	})
+}
+
+// optionLess orders options by label, case-insensitive, then by value.
+func optionLess(left, right FilterOption) bool {
+	leftLabel := strings.ToLower(left.Label)
+	rightLabel := strings.ToLower(right.Label)
+	if leftLabel == rightLabel {
+		return left.Value < right.Value
+	}
+	return leftLabel < rightLabel
 }
