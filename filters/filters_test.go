@@ -36,21 +36,35 @@ func TestFilterGroupValidate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:  "search-select accepts no showTop",
-			group: FilterGroup{Key: "organisation", Type: "search-select"},
+			name:  "search-single-select accepts no showTop",
+			group: FilterGroup{Key: "organisation", Type: TypeSearchSingleSelect},
 		},
 		{
-			name:  "search-select accepts positive showTop",
-			group: FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(10)},
+			name:  "search-single-select accepts positive showTop",
+			group: FilterGroup{Key: "organisation", Type: TypeSearchSingleSelect, ShowTop: intPtr(10)},
 		},
 		{
-			name:    "search-select rejects zero showTop",
-			group:   FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(0)},
+			name:  "search-multi-select accepts positive showTop",
+			group: FilterGroup{Key: "organisation", Type: TypeSearchMultiSelect, ShowTop: intPtr(10)},
+		},
+		{
+			name:    "search-single-select rejects zero showTop",
+			group:   FilterGroup{Key: "organisation", Type: TypeSearchSingleSelect, ShowTop: intPtr(0)},
 			wantErr: true,
 		},
 		{
-			name:    "showTop only applies to search-select",
+			name:    "search-multi-select rejects zero showTop",
+			group:   FilterGroup{Key: "organisation", Type: TypeSearchMultiSelect, ShowTop: intPtr(0)},
+			wantErr: true,
+		},
+		{
+			name:    "showTop does not apply to multi-select",
 			group:   FilterGroup{Key: "license", Type: "multi-select", ShowTop: intPtr(5)},
+			wantErr: true,
+		},
+		{
+			name:    "showTop does not apply to deprecated search-select",
+			group:   FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(10)},
 			wantErr: true,
 		},
 		{
@@ -160,7 +174,7 @@ func TestFilterGroupMarshalsShowTopOnlyWhenSet(t *testing.T) {
 	if strings.Contains(string(without), "showTop") {
 		t.Fatalf("showTop present without value: %s", without)
 	}
-	with, err := json.Marshal(FilterGroup{Key: "organisation", Type: "search-select", ShowTop: intPtr(10)})
+	with, err := json.Marshal(FilterGroup{Key: "organisation", Type: TypeSearchSingleSelect, ShowTop: intPtr(10)})
 	if err != nil {
 		t.Fatal(err)
 	}

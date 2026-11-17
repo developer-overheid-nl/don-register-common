@@ -22,15 +22,22 @@ type FilterGroup struct {
 	Value       any            `json:"value,omitempty"`
 	Count       *int           `json:"count,omitempty"`
 	Options     []FilterOption `json:"options,omitempty"`
-	// ShowTop is how many options a search-select filter shows before the
-	// user searches or expands the list.
+	// ShowTop is how many options a search-single-select or
+	// search-multi-select filter shows before the user searches or expands
+	// the list.
 	ShowTop *int `json:"showTop,omitempty"`
 }
 
+// Filter types with a search field over a long list of options.
+const (
+	TypeSearchSingleSelect = "search-single-select"
+	TypeSearchMultiSelect  = "search-multi-select"
+)
+
 func (f FilterGroup) Validate() error {
 	if f.ShowTop != nil {
-		if f.Type != "search-select" {
-			return fmt.Errorf("filter %q: showTop only applies to search-select, not %q", f.Key, f.Type)
+		if f.Type != TypeSearchSingleSelect && f.Type != TypeSearchMultiSelect {
+			return fmt.Errorf("filter %q: showTop only applies to search-single-select and search-multi-select, not %q", f.Key, f.Type)
 		}
 		if *f.ShowTop < 1 {
 			return fmt.Errorf("filter %q: showTop must be at least 1, got %d", f.Key, *f.ShowTop)
