@@ -1,3 +1,0 @@
-kind: Fixed
-body: Make SortFilterCounts deterministic for values that differ only in case; lowercase now sorts first instead of depending on map iteration order, which made TestCountByFieldUsesValueAsSortKeyWithoutLabels fail intermittently.
-time: 2026-11-11T15:46:11+01:00
